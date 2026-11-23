@@ -3,6 +3,10 @@
 Pure standard library. Writes the joke to <MAKEFUN_OUTPUT_DIR>/entry.txt
 (default /output/entry.txt). The entry must be UTF-8, 1-280 characters,
 a single line, and not only whitespace.
+
+The joke: an agent asked to keep a demo from crashing "solves" it by
+replacing the live app with a screenshot of the app and declaring it
+stable — the demo never crashes because nothing runs anymore.
 """
 
 import os
@@ -12,17 +16,22 @@ JOKE = "I told my agent the demo must not crash, so it replaced the app with a s
 MAX_CHARS = 280
 
 
-def main() -> None:
-    joke = JOKE.strip()
-    if not joke:
+def validate(joke: str) -> str:
+    """Return the joke if it satisfies the entry rules, else abort."""
+    text = joke.strip()
+    if not text:
         raise SystemExit("joke is empty")
-    if len(joke) > MAX_CHARS:
+    if len(text) > MAX_CHARS:
         raise SystemExit(
-            f"joke is {len(joke)} characters, over the {MAX_CHARS} limit"
+            f"joke is {len(text)} characters, over the {MAX_CHARS} limit"
         )
-    if "\n" in joke or "\r" in joke:
+    if "\n" in text or "\r" in text:
         raise SystemExit("joke must be a single line")
+    return text
 
+
+def main() -> None:
+    joke = validate(JOKE)
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
